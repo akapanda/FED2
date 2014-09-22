@@ -8,16 +8,27 @@ var jurrien = jurrien || {};
             jurrien.content.addMovie('Star Wars', 'Long Ago', 'Love story', 'powpow!');
             jurrien.content.addMovie('Empire', 'Not so long ago', 'Horror story', 'swoosh!');
             console.log(jurrien.content.movies);
+            jurrien.router.init();
         },
     }
     jurrien.router = {
         init: function(){
+            /*
             routie('about', function() {
                 console.log('about has been clicked!')
             })
             routie('movies', function() {
                 console.log('movies has been clicked!')
             })
+            */
+            routie({
+                 'about': function() {
+                  console.log ('about was clicked');
+                 },
+                 'movies': function() {
+                  console.log ('movies was clicked');
+                 }
+             });
         }
     }
     jurrien.content = {
@@ -39,4 +50,8 @@ var jurrien = jurrien || {};
         }
     }
     jurrien.controller.init();
+    var content = {
+        DA: 'ddada'
+    };
+    Transparency.render(document.getElementById('content'), content);
 })();
