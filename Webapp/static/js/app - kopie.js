@@ -5,7 +5,10 @@ var jurrien = jurrien || {};
     jurrien.controller = {
         init: function() {
             jurrien.router.init();
-    
+            jurrien.content.addMovie("Shawshank Redemption", "14 October 1994", "Two imprisoned men bond over a number of years, finding solace and eventual redemption through acts of common decency.", "images/shawshank-redemption.jpg");
+            jurrien.content.addMovie("The Godfather", "24 March 1972", "The aging patriarch of an organized crime dynasty transfers control of his clandestine empire to his reluctant son", "images/the-godfather.jpg");
+            jurrien.content.addMovie("Pulp Fiction", "14 October 1994", "The lives of two mob hit men, a boxer, a gangster's wife, and a pair of diner bandits intertwine in four tales of violence and redemption.", "images/pulp-fiction.jpg");
+            jurrien.content.addMovie("The Dark Knight", "18 July 2008", "When Batman, Gordon and Harvey Dent launch an assault on the mob, they let the clown out of the box, the Joker, bent on turning Gotham on itself and bringing any heroes down to his level.", "images/the-dark-knight.jpg");
             /* Delete the comments to add the movie "Star Wars" */
             /*
             jurrien.content.addMovie("Star Wars", "15 december 1977", "Luke Skywalker joins forces with a Jedi Knight, a cocky pilot, a wookiee and two droids to save the universe from the Empire's world-destroying battle-station, while also attempting to rescue Princess Leia from the evil Darth Vader.");
@@ -57,6 +60,23 @@ var jurrien = jurrien || {};
         //addMovie lets you easily add movies to the list
         //At this moment (23/9/2014) I don't know how to add movie cover-images. I have experimented with changing the contents of the src property, 
         //but it doesn't seem to accept being in an array like the movies-array. Please fork my code and help me if you want to!
+        addMovie: function(title, releaseDate, description, cover){
+            var movieMaker = {
+                movieTitle: title,
+                movieReleaseDateLabel: "Release date: ",
+                movieReleaseDate: releaseDate,
+                movieDescription: description,
+                movieImage: cover
+            }
+            this.movies.push(movieMaker);
+        },
+        directives: {
+            movieImage: {
+                src: function(params){
+                    return this.movieImage
+                }
+            }
+        }
         
     }
     jurrien.sections = {
@@ -68,15 +88,8 @@ var jurrien = jurrien || {};
             Transparency.render(document.getElementById("content"), jurrien.content.about);
         },
         movies: function (data){
-            jurrien.content.movies = data;
-            var directives = {
-                    cover: {
-                        src: function(params){
-                            return this.cover
-                        }
-                    }
-            }
-            Transparency.render(document.getElementById("movieInstance"), jurrien.content.movies, directives);
+            Transparency.render(document.getElementById("movieInstance"), jurrien.content.movies, jurrien.content.directives);
+            console.log(data);
         },
         toggle: function(section) {
             if (section == "movies") {

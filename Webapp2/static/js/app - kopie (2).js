@@ -13,6 +13,10 @@ var jurrien = jurrien || {};
             jurrien.sections.init();
             console.log("All objects initialized...");
         },
+        store: function(data) {
+            var movieDataFill = data;
+            localStorage.setItem("movieData", movieDataFill);
+        }
     }
     jurrien.router = {
         init: function(){
@@ -96,5 +100,7 @@ var jurrien = jurrien || {};
      console.log(data);
     });
     */
-    jurrien.xhr.trigger("GET", "http://dennistel.nl/movies", jurrien.sections.movies);
+    jurrien.xhr.trigger("GET", "http://dennistel.nl/movies", jurrien.controller.store);
+    var localStorageData = localStorage.getItem("movieData");
+    console.log(localStorageData);
 })();

@@ -5,14 +5,15 @@ var jurrien = jurrien || {};
     jurrien.controller = {
         init: function() {
             jurrien.router.init();
-    
-            /* Delete the comments to add the movie "Star Wars" */
-            /*
-            jurrien.content.addMovie("Star Wars", "15 december 1977", "Luke Skywalker joins forces with a Jedi Knight, a cocky pilot, a wookiee and two droids to save the universe from the Empire's world-destroying battle-station, while also attempting to rescue Princess Leia from the evil Darth Vader.");
-            */
+            jurrien.xhr.trigger("GET", "http://dennistel.nl/movies", this.store);
+            var parsedData = JSON.parse(localStorage.getItem("movieData"));
+            jurrien.content.loadMovieData(parsedData);
             jurrien.sections.init();
             console.log("All objects initialized...");
         },
+        store: function(data) {
+            localStorage.setItem("movieData", data);
+        }
     }
     jurrien.router = {
         init: function(){
@@ -22,6 +23,9 @@ var jurrien = jurrien || {};
                 },
                 'movies': function() {
                     jurrien.sections.toggle("movies");
+                },
+                '*' : function () {
+                    jurrien.sections.toggle("about");
                 }
             });
         }
@@ -37,7 +41,7 @@ var jurrien = jurrien || {};
             req.onreadystatechange = function() {
                 if (req.readyState === 4) {
                     if (req.status === 200 || req.status === 201) {
-                        success(JSON.parse(req.responseText));
+                        success(req.responseText);
                     };
                 };
             };
@@ -57,7 +61,9 @@ var jurrien = jurrien || {};
         //addMovie lets you easily add movies to the list
         //At this moment (23/9/2014) I don't know how to add movie cover-images. I have experimented with changing the contents of the src property, 
         //but it doesn't seem to accept being in an array like the movies-array. Please fork my code and help me if you want to!
-        
+        loadMovieData: function(data) {
+            this.movies = data;
+        }
     }
     jurrien.sections = {
         init: function() {
@@ -68,7 +74,6 @@ var jurrien = jurrien || {};
             Transparency.render(document.getElementById("content"), jurrien.content.about);
         },
         movies: function (data){
-            jurrien.content.movies = data;
             var directives = {
                     cover: {
                         src: function(params){
@@ -96,5 +101,4 @@ var jurrien = jurrien || {};
      console.log(data);
     });
     */
-    jurrien.xhr.trigger("GET", "http://dennistel.nl/movies", jurrien.sections.movies);
 })();
