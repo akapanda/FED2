@@ -1,36 +1,34 @@
-var jurrien = jurrien || {};
+var movieshelf = movieshelf || {};
 
 
 (function(){
-    jurrien.controller = {
+
+    movieshelf.controller = {
         init: function() {
-            jurrien.router.init();
-            jurrien.xhr.trigger("GET", "http://dennistel.nl/movies", this.store);
-            var parsedData = JSON.parse(localStorage.getItem("movieData"));
-            jurrien.content.loadMovieData(parsedData);
-            jurrien.sections.init();
-            console.log("All objects initialized...");
+            movieshelf.data.load("http://dennistel.nl/movies");
+            movieshelf.router.init();
+            movieshelf.dataManipulate.reduceReviews();
+            movieshelf.sections.init();
         },
-        store: function(data) {
-            localStorage.setItem("movieData", data);
-        }
     }
-    jurrien.router = {
+
+    movieshelf.router = {
         init: function(){
             routie({
                 'about': function() {
-                    jurrien.sections.toggle("about");
+                    movieshelf.sections.toggle("about");
                 },
                 'movies': function() {
-                    jurrien.sections.toggle("movies");
+                    movieshelf.sections.toggle("movies");
                 },
                 '*' : function () {
-                    jurrien.sections.toggle("about");
+                    movieshelf.sections.toggle("about");
                 }
             });
         }
     }
-    jurrien.xhr = {
+
+    movieshelf.xhr = {
         trigger: function(type, url, success, data) {
             var req = new XMLHttpRequest;
             req.open(type, url, true);
@@ -47,41 +45,65 @@ var jurrien = jurrien || {};
             };
         }
     }
-    jurrien.content = {
+
+    movieshelf.content = {
         about: {
-            //Content for about. This content is static. This could be made customizable like the addMovie-method, but I decided to make this static to show both ways it can be done.
             header: "About this app",
             section1: "Cities fall but they are rebuilt. heroes die but they are remembered. the man likes to play chess; let's get him some rocks. circumstances have taught me that a man's ethics are the only possessions he will take beyond the grave. multiply your anger by about a hundred, kate, that's how much he thinks he loves you. bruce... i'm god. multiply your anger by about a hundred, kate, that's how much he thinks he loves you. no, this is mount everest. you should flip on the discovery channel from time to time. but i guess you can't now, being dead and all. rehabilitated? well, now let me see. you know, i don't have any idea what that means. mister wayne, if you don't want to tell me exactly what you're doing, when i'm asked, i don't have to lie. but don't think of me as an idiot. rehabilitated? well, now let me see. you know, i don't have any idea what that means. cities fall but they are rebuilt. heroes die but they are remembered. no, this is mount everest. you should flip on the discovery channel from time to time. but i guess you can't now, being dead and all.", 
             section2: "I did the same thing to gandhi, he didn't eat for three weeks. bruce... i'm god. cities fall but they are rebuilt. heroes die but they are remembered. i once heard a wise man say there are no perfect men. only perfect intentions. cities fall but they are rebuilt. heroes die but they are remembered. boxing is about respect. getting it for yourself, and taking it away from the other guy. well, what is it today? more spelunking? let me tell you something my friend. hope is a dangerous thing. hope can drive a man insane. bruce... i'm god. well, what is it today? more spelunking? it only took me six days. same time it took the lord to make the world. i did the same thing to gandhi, he didn't eat for three weeks.", 
             section3: "Let me tell you something my friend. hope is a dangerous thing. hope can drive a man insane. boxing is about respect. getting it for yourself, and taking it away from the other guy. mister wayne, if you don't want to tell me exactly what you're doing, when i'm asked, i don't have to lie. but don't think of me as an idiot. you measure yourself by the people who measure themselves by you. circumstances have taught me that a man's ethics are the only possessions he will take beyond the grave. circumstances have taught me that a man's ethics are the only possessions he will take beyond the grave. you measure yourself by the people who measure themselves by you. you measure yourself by the people who measure themselves by you. that tall drink of water with the silver spoon up his ass. i once heard a wise man say there are no perfect men. only perfect intentions. mister wayne, if you don't want to tell me exactly what you're doing, when i'm asked, i don't have to lie. but don't think of me as an idiot. boxing is about respect. getting it for yourself, and taking it away from the other guy.",  
             section4: "That tall drink of water with the silver spoon up his ass. well, what is it today? more spelunking? i now issue a new commandment: thou shalt do the dance. let me tell you something my friend. hope is a dangerous thing. hope can drive a man insane. i did the same thing to gandhi, he didn't eat for three weeks. the man likes to play chess; let's get him some rocks. i now issue a new commandment: thou shalt do the dance. i now issue a new commandment: thou shalt do the dance. multiply your anger by about a hundred, kate, that's how much he thinks he loves you. i don't think they tried to market it to the billionaire, spelunking, base-jumping crowd. that tall drink of water with the silver spoon up his ass. it only took me six days. same time it took the lord to make the world."
         },
-        //The array is empty so it's easy to add new movies
         movies: [],
-        //addMovie lets you easily add movies to the list
-        //At this moment (23/9/2014) I don't know how to add movie cover-images. I have experimented with changing the contents of the src property, 
-        //but it doesn't seem to accept being in an array like the movies-array. Please fork my code and help me if you want to!
-        loadMovieData: function(data) {
-            this.movies = data;
+    }
+
+    movieshelf.data = {
+        load: function(url) {
+            movieshelf.xhr.trigger("GET", url, this.localStore);
+            var parsedData = JSON.parse(localStorage.getItem("movieData"));
+            this.localPull(parsedData);
+        },
+        localStore : function(data) {
+            localStorage.setItem("movieData", data);
+        },
+        localPull: function(data) {
+            movieshelf.content.movies = data;
         }
     }
-    jurrien.sections = {
+
+    movieshelf.dataManipulate = {
+        reduceReviews: function() {
+            _.filter(
+                _.map(movieshelf.content.movies, function (movie, i){
+                    movie.reviews = _.reduce(
+                        movie.reviews, function(memo, review){   
+                                return memo + review.score; 
+                            }, 
+                            0) / movie.reviews.length;
+                            return movie;
+                    })
+            );
+        }
+    }
+
+    movieshelf.sections = {
         init: function() {
-            jurrien.sections.about();
-            jurrien.sections.movies();
+            this.about();
+            this.movies();
         },
         about: function() {
-            Transparency.render(document.getElementById("content"), jurrien.content.about);
+            Transparency.render(document.getElementById("content"), movieshelf.content.about);
         },
-        movies: function (data){
+        movies: function (){
             var directives = {
                     cover: {
                         src: function(params){
                             return this.cover
                         }
-                    }
+                    },
             }
-            Transparency.render(document.getElementById("movieInstance"), jurrien.content.movies, directives);
+
+            Transparency.render(document.getElementById("movieInstance"), movieshelf.content.movies, directives);
         },
         toggle: function(section) {
             if (section == "movies") {
@@ -92,13 +114,9 @@ var jurrien = jurrien || {};
                 document.querySelector("#about").classList.add("active");
                 document.querySelector("#movies").classList.remove("active");
             };
-        }
+        },
     }
-    //This function will initialize all systems.
-    jurrien.controller.init();
-    /*
-    jurrien.xhr.trigger("GET", "http://dennistel.nl/movies", function(data){
-     console.log(data);
-    });
-    */
+
+    movieshelf.controller.init();
+    
 })();
