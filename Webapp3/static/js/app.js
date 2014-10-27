@@ -6,9 +6,10 @@ var movieshelf = movieshelf || {};
     movieshelf.controller = {
         init: function() {
             movieshelf.data.load("http://dennistel.nl/movies");
-            movieshelf.router.init();
-            movieshelf.dataManipulate.reduceReviews();
+            //movieshelf.dataManipulate.reduceReviews();
+            movieshelf.dataManipulate.filter();
             movieshelf.sections.init();
+            movieshelf.router.init();
         },
     }
 
@@ -23,6 +24,10 @@ var movieshelf = movieshelf || {};
                 },
                 'details': function() {
                     movieshelf.sections.toggle("details");
+                },
+                '#/movies/:1' : function () {
+                    movieshelf.sections.toggle("details");
+                    console.log("bla!");
                 },
                 '*' : function () {
                     movieshelf.sections.toggle("about");
@@ -76,7 +81,6 @@ var movieshelf = movieshelf || {};
 
     movieshelf.dataManipulate = {
         reduceReviews: function() {
-            _.filter(
                 _.map(movieshelf.content.movies, function (movie, i){
                     movie.reviews = _.reduce(
                         movie.reviews, function(memo, review){   
@@ -85,7 +89,14 @@ var movieshelf = movieshelf || {};
                             0) / movie.reviews.length;
                             return movie;
                     })
-            );
+        },
+        filter: function () {
+            _.filter(
+                _.map(movieshelf.content.movies, function (movie, i){
+                    return movie;
+                }), 
+                function (movie) { return _.contains(movie.genres, 'Crime');
+            })
         }
     }
 
@@ -101,6 +112,11 @@ var movieshelf = movieshelf || {};
                     cover: {
                         src: function(params){
                             return this.cover
+                        }
+                    },
+                    id: {
+                        href: function(params){
+                            return "#/movies/:" + this.id
                         }
                     }
             },
