@@ -25,10 +25,12 @@ var movieshelf = movieshelf || {};
                 'details': function() {
                     movieshelf.sections.toggle("details");
                 },
+                /*
                 '#/movies/:1' : function () {
                     movieshelf.sections.toggle("details");
                     console.log("bla!");
                 },
+                */
                 '*' : function () {
                     movieshelf.sections.toggle("about");
                 }
