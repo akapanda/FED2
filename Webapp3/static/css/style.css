@@ -1,6 +1,7 @@
 * {
 	font-family: helvetica;
-	color: white;
+	margin: 0pt;
+	padding: 0pt;
 }
 main>section {
 	display: none;
@@ -17,35 +18,52 @@ main>section {
 #id {
 	display: inline-block;
 	width: 100px;
-	background-color: red;
-	color: red;
+	background-color: silver;
+	color: silver;
 }
 body {
-	background-color: #282828;
-	width: 80%;
+	background-color: #EA1F38;
 	text-align: center;
 	margin: auto;
 }
+body > header> h1 {
+	color: white;
+}
 section {
-	background-color: black;
-	padding: 20pt;
+	padding: 5pt;
 }
 header {
 	display: float;
+}
+nav {
+	margin-top: 5pt;
 }
 nav > ul {
 	list-style: none;
 	display: inline;
 }
 nav > ul li {
-	padding: 20pt;
 	margin-bottom: 5pt;
 	background-color: white;
+	padding: 5pt;
+	display: inline-block;
 }
 ul li a {
 	color: black;
 	font-size: 18pt;
-	padding: 20pt;
-	margin-bottom: 5pt;
 	background-color: white;
+	text-decoration: none;
+}
+#movieInstance {
+	display: inline-block;
+	background-color: white;
+	color: black;
+	margin: 5pt;
+}
+#content {
+	display: inline-block;
+	margin: 100px;
+	background-color: white;
+	color: black;
+	padding: 5pt;
 }

@@ -10,8 +10,17 @@
         
     </head>
     <body>	
+    	<header>
+    		<h1>movieshelf</h1>
+			<nav>
+				<ul>
+					<li><a href="#about">About</a></a></li>
+					<li><a href="#movies">Movies</a></li>
+					<li><a href="#details">Show Details</a></li>
+				</ul>
+			</nav>
+		</header>
 		<main id="content">
-			<section id="about">
 				<section>
 					<header>
 						<h1 id="header"></h1>
@@ -24,10 +33,9 @@
 			</section>
 
 			<section id="movies">
-				<h1>Favorite movies</h1>	
 				<article id="movieInstance">
 					<header>
-						<a href="" id="id"></a><h1 class="title">Shawshank Redemption</h1><h2 id="reviews"><h2 id="score"></h2>
+						<h1 class="title">Shawshank Redemption</h1><h2 id="reviews"><h2 id="score"></h2>
 						<em class="movieReleaseDateLabel">Release date: <time class="release_date">14 October 1994</time></em>
 					</header>
 
@@ -37,19 +45,10 @@
 
 					<p class="plot">Two imprisoned men bond over a number of years, finding solace and eventual redemption through acts of common decency.</p>
 					<ul class="actors nodetail"><li class="actor_name"></ul>
+					<a href="" id="id"></a>
 				</article>
 			</section>
 		</main>
-		
-		<header>
-			<nav>
-				<ul>
-					<li><a href="#about">About</a></a></li>
-					<li><a href="#movies">Movies</a></li>
-					<li><a href="#details">Show Details</a></li>
-				</ul>
-			</nav>
-		</header>
 		<script src="static/js/vendor/routie.js"></script>
 		<script src="static/js/vendor/jquery-1.11.1.min.js"></script>
         <script src="static/js/vendor/transparency.min.js"></script>
