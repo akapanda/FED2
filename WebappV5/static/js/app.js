@@ -6,9 +6,8 @@ var movieshelf = movieshelf || {};
     movieshelf.controller = {
         init: function() {
             movieshelf.router.init();
-            movieshelf.data.load("http://dennistel.nl/movies");
+            movieshelf.data.loadData();
             movieshelf.dataManipulate.reduceReviews();
-            movieshelf.dataManipulate.filter();
             movieshelf.sections.init();
             
         },
@@ -26,9 +25,8 @@ var movieshelf = movieshelf || {};
                 'details': function() {
                     movieshelf.sections.toggle("details");
                 },
-                //zonder # en VAN 1 EEN VAR MAKEN
-                'movies/1' : function () {
-                   console.log("ping"); 
+                'movies/:id': function (id) {
+                   movieshelf.sections.getDetail(id, movieshelf.content.movies);
                 },
                 '*' : function () {
                     movieshelf.sections.toggle("about");
@@ -66,18 +64,28 @@ var movieshelf = movieshelf || {};
         movies: [],
     }
 
-    movieshelf.data = {
-        load: function(url) {
-            //if localstorage = vol, dan doe je dit niet opnieuw. anders: xhr oproepen.
-            movieshelf.xhr.trigger("GET", url, this.localStore);
-            var parsedData = JSON.parse(localStorage.getItem("movieData"));
-            this.localPull(parsedData);
+     movieshelf.data = {
+        loadData: function() {
+            if (localStorage.getItem("movieData") === null) {
+                movieshelf.xhr.trigger("GET", "http://dennistel.nl/movies", this.localStore);
+                var parsedData = JSON.parse(localStorage.getItem("movieData"));
+                this.dataPlacer(parsedData);
+            } else {
+                var parsedData = JSON.parse(localStorage.getItem("movieData"));
+                this.dataPlacer(parsedData)
+            }
+            
         },
-        localStore : function(data) {
+        localStore: function(data) {
             localStorage.setItem("movieData", data);
         },
-        localPull: function(data) {
+        dataPlacer: function(data) {
             movieshelf.content.movies = data;
+        },
+        updateData: function() {
+            movieshelf.xhr.trigger("GET", "http://dennistel.nl/movies", this.localStore);
+            var parsedData = JSON.parse(localStorage.getItem("movieData"));
+            this.dataPlacer(parsedData);
         }
     }
 
@@ -94,24 +102,24 @@ var movieshelf = movieshelf || {};
                     })
             );
         },
-        filter: function () {
-            _.filter(
-                //filter in map
-                _.map(movieshelf.content.movies, function (movie, i) {
-                    return movie;
-                }), 
-                function (movie) { return _.contains(movie.genres, 'Crime');
-            })
+        filter: function(key, array) {
+            // filter door de meegegeven array en sla die op in filtered
+            var filtered = _.filter(array, function(array){ 
+                //return alle objecten die de key in array.genres hebben staan
+                return _.contains(array.genres, key);
+            });
+
+            movieshelf.sections.movies(filtered);
         },
     }
 
     movieshelf.sections = {
         init: function() {
-            this.about();
-            this.movies();
+            this.about(movieshelf.content.about);
+            this.movies(movieshelf.content.movies);
         },
-        about: function() {
-            Transparency.render(document.getElementById("content"), movieshelf.content.about);
+        about: function(data) {
+            Transparency.render(document.getElementById("content"), data);
         },
         directives: {
                     cover: {
@@ -119,14 +127,23 @@ var movieshelf = movieshelf || {};
                             return this.cover
                         }
                     },
-                    da: {
+                    detailLink: {
                         href: function(params) {
                             return "#movies/" + this.id
                         }
                     }
             },
-        movies: function () {
-            Transparency.render(document.getElementById("movieInstance"), movieshelf.content.movies, this.directives);
+        movies: function (data) {
+            Transparency.render(document.getElementById("movieInstance"), data, this.directives);
+        },
+        getDetail: function (key, array) {
+            var detailObj = _.filter(array, function (movie) {
+                return movie.id == key;
+            });
+            this.renderDetail(detailObj[0]);
+        },
+        renderDetail: function (data) {
+            Transparency.render(document.getElementById("movieDetail"), data, this.directives);
         },
         deactivateAll: function () {
             document.querySelector("#about").classList.remove("active");
@@ -141,6 +158,18 @@ var movieshelf = movieshelf || {};
                 this.deactivateAll();
                 document.querySelector("#about").classList.add("active");
             }
+        }
+    },
+    movieshelf.genreFilter = {
+        OnChange: function (dropdown) {
+        var value = dropdown.options[dropdown.selectedIndex].value;
+        if (value == "ShowAll") {
+            movieshelf.sections.movies(movieshelf.content.movies);
+            }
+            else {
+                movieshelf.dataManipulate.filter(value, movieshelf.content.movies);
+            };
+            return true;
         }
     }
 
